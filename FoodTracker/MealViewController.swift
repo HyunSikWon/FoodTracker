@@ -7,21 +7,30 @@
 //
 
 import UIKit
+import os.log
 
-class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     // MARK: Properties
     @IBOutlet weak var nameTextField: UITextField!
-    @IBOutlet weak var mealNameLabel: UILabel!
     @IBOutlet weak var photoImageView: UIImageView!
+    @IBOutlet var ratingControl: RatingControl!
+    @IBOutlet var saveButton: UIBarButtonItem!
+    var meal: Meal?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // The self refers to the ViewController class, because it’s referenced inside the scope of the ViewController class definition.
+         // Handle the text field’s user input through delegate callbacks.
         nameTextField.delegate = self
+        // Enable the Save button only if the text field has a valid Meal name.
+        updateSaveButtonState()
     }
     
     // MARK: UITextFieldDelegate
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        saveButton.isEnabled = false
+    }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
@@ -30,7 +39,8 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     
     //    textFieldDidEndEditing(_:), is called after the text field resigns its first-responder status. Because you resign first responder status in textFieldShouldReturn, the system calls this method just after calling textFieldShouldReturn.
     func textFieldDidEndEditing(_ textField: UITextField) {
-        mealNameLabel.text = textField.text
+        updateSaveButtonState()
+        navigationItem.title = nameTextField.text
     }
     
     //MARK: UIImagePickerControllerDelegate
@@ -50,6 +60,26 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         
         dismiss(animated: true, completion: nil)
     }
+    //MARK: Navigation
+    @IBAction func cancelButton(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        super.prepare(for: segue, sender: sender)
+        
+        guard let button = sender as? UIBarButtonItem, button == saveButton else {
+            os_log("The save button was not pressed, cancelling", log: OSLog.default, type: .debug)
+            return
+        }
+        
+        let name = nameTextField.text ?? ""
+        let photo = photoImageView.image
+        let rating = ratingControl.rating
+        
+        meal = Meal(name: name, photo: photo, rating: rating)
+        
+    }
+    
     
     //MARK: Actions
     @IBAction func selectImageFromPhotoLibrary(_ sender: UITapGestureRecognizer) {
@@ -66,8 +96,10 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         present(imagePickerController, animated: true, completion: nil)
     }
     
-    @IBAction func setDefaultLabelText(_ sender: UIButton) {
-        mealNameLabel.text = "Default Text"
+    //MARK: Private Methods
+    private func updateSaveButtonState() {
+        let name = nameTextField.text ?? ""
+        saveButton.isEnabled = !name.isEmpty
     }
     
 }

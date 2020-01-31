@@ -13,6 +13,7 @@ import UIKit
     
     //MARK: Properties
     private var ratingButtons = [UIButton]()
+    
     var rating = 0 {
         didSet {
             updateButtonSelectionStates() // rating의 값이 설정될때마다 호출
@@ -46,7 +47,6 @@ import UIKit
         guard let index = ratingButtons.firstIndex(of: button) else {
             fatalError("The button, \(button), is not in the ratingButtons array: \(ratingButtons)")
         }
-        
         let selectedRating = index + 1
         
         if selectedRating == rating {

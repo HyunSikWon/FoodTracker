@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import os.log
 
-class Meal: NSObject, NSCoding {
+class Meal {
     
     //MARK: Properties
     var name: String
@@ -18,16 +18,10 @@ class Meal: NSObject, NSCoding {
     var rating: Int
     
     //MARK: Archiving Paths
-    static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
-    static let ArchiveURL = DocumentsDirectory.appendingPathComponent("meals")
-    
-    //MARK: Types
-    struct PropertyKey {
-        static let name = "name"
-        static let photo = "photo"
-        static let rating = "rating"
-        
-    }
+//    static var archiveURL: URL {
+//        let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+//        return documentDirectory.appendingPathComponent("meals").appendingPathExtension("plist")
+//    }
     
     //MARK: Initialization
     init?(name: String, photo: UIImage?, rating: Int) {
@@ -44,25 +38,25 @@ class Meal: NSObject, NSCoding {
         self.photo = photo
         self.rating = rating
     }
-    
-    //MARK: NSCoding
-    func encode(with coder: NSCoder) {
-        coder.encode(name,forKey: PropertyKey.name)
-        coder.encode(photo, forKey: PropertyKey.photo)
-        coder.encode(rating, forKey: PropertyKey.rating)
-    }
-    
-    required convenience init?(coder: NSCoder) {
-        guard let name = coder.decodeObject(forKey: PropertyKey.name) as? String else {
-            os_log("Unable to decode the name for a Meal object.", log: OSLog.default, type: .debug)
-            return nil
-        }
-        
-        let photo = coder.decodeObject(forKey: PropertyKey.photo) as? UIImage
-        let rating = coder.decodeInteger(forKey: PropertyKey.rating)
-        
-        self.init(name: name, photo: photo, rating: rating )
-    }
-    
-    
+
+    //MARK: Encoding & Decoding
+//    static func saveToFiles(meals: [Meal]) {
+//        let pListEncoder = PropertyListEncoder()
+//        let encodedMeals = try? pListEncoder.encode(meals)
+//        try? encodedMeals?.write(to: Meal.archiveURL)
+//        
+//    }
+//    
+//    static func loadFromFile() -> [Meal] {
+//        let pListDecoder = PropertyListDecoder()
+//        var mealsArr: [Meal] = []
+//        
+//        if let retrievedMealsData = try? Data(contentsOf: Meal.archiveURL),
+//            let decodedMeals = try? pListDecoder.decode(Array<Meal>.self, from: retrievedMealsData) {
+//            mealsArr = decodedMeals
+//            
+//        }
+//        return mealsArr
+//    }
+
 }
